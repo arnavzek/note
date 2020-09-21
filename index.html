@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/ledger_1f4d2.png"
+    />
+    <meta
+      name="description"
+      content="No Login | No Bullshit | Take notes offline"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Note</title>
+    <style>
+      textarea {
+        height: 100%;
+        overflow: hidden;
+        padding: 20px;
+        font-size: 22px;
+        box-sizing: border-box;
+        background: inherit;
+        color: #fff;
+        outline: none;
+        width: 100vw;
+        flex-grow: 1;
+        overflow-y: scroll;
+        border: none;
+        resize: none;
+        font-family: inherit;
+        color: inherit;
+        display: flex;
+      }
+
+      div {
+        height: 30px;
+        font-weight: 100;
+        color: #999;
+        font-size: 14px;
+        padding: 5px;
+        text-align: right;
+        background: inherit;
+        z-index: 55;
+        padding: 10px;
+        color: #999;
+      }
+      body {
+        background: #333;
+        color: #fff;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        width: 100vw;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+          "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+          "Helvetica Neue", sans-serif;
+      }
+
+      /* width */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      /* Track */
+      ::-webkit-scrollbar-track {
+        border-radius: 7px;
+        cursor: pointer;
+      }
+
+      /* Handle */
+      ::-webkit-scrollbar-thumb {
+        background: #111;
+        cursor: pointer;
+        border-radius: 7px;
+      }
+
+      /* Handle on hover */
+      ::-webkit-scrollbar-thumb:hover {
+        background: #111;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea tabindex="1"></textarea>
+    <div>No Login | No Bullshit | Take notes offline</div>
+  </body>
+  <script src="http://source.upon.one" class="dontHost"></script>
+
+  <script class="dontHost">
+    U.run("note", { searchable: true });
+  </script>
+
+  <script>
+    const codebox = document.querySelector("textarea");
+    codebox.focus();
+    document.querySelector("textarea").addEventListener("keydown", (e) => {
+      let { keyCode } = e;
+
+      let { value, selectionStart, selectionEnd } = codebox;
+
+      console.log(e);
+      if (keyCode === 9) {
+        // TAB = 9
+        e.preventDefault();
+        codebox.value =
+          value.slice(0, selectionStart) + "\t" + value.slice(selectionEnd);
+        codebox.setSelectionRange(selectionStart + 1, selectionStart + 1);
+      }
+    });
+
+    document.querySelector("textarea").addEventListener("keyup", (e) => {
+      localStorage.setItem("data", e.target.value);
+    });
+
+    window.addEventListener("load", () => {
+      let data = localStorage.getItem("data");
+      codebox.value = data;
+    });
+  </script>
+</html>
