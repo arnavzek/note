@@ -2,7 +2,7 @@
 
 No Login | No Bullshit | Take notes offline
 
-Live @ <a href="http://rough.upon.one">http://note.upon.one</a>
+Live @ <a href="http://rough.upon.one">http://rough.upon.one</a>
 
 # Features to add
 
