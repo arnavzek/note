@@ -33,16 +33,17 @@
         display: flex;
       }
 
-      div {
-        height: 30px;
+      .footer {
+        height: 10px;
         font-weight: 100;
         color: #999;
-        font-size: 14px;
+        font-size: 10px;
         padding: 5px;
-        text-align: right;
+        display: flex;
         background: inherit;
         z-index: 55;
         padding: 10px;
+        justify-content: space-between;
         color: #999;
       }
       body {
@@ -58,6 +59,10 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
           "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
           "Helvetica Neue", sans-serif;
+      }
+
+      a {
+        color: inherit;
       }
 
       /* width */
@@ -82,41 +87,75 @@
       ::-webkit-scrollbar-thumb:hover {
         background: #111;
       }
+
+      @media (min-width: 800px) {
+        .footer {
+          height: 20px;
+          font-size: 14px;
+        }
+      }
     </style>
   </head>
   <body>
     <textarea tabindex="1"></textarea>
-    <div>No Login | No Bullshit | Take notes offline</div>
-  </body>
-  <script src="http://source.upon.one" class="dontHost"></script>
+    <div class="footer">
+      <span> No signup | No bullshit | Take notes offline </span>
 
-  <script class="dontHost">
-    U.run("note", { searchable: true });
-  </script>
+      <div class="links">
+        <a target="_blank" href="https://github.com/itsarnavsingh/note"
+          >Fork on Github</a
+        >
+      </div>
+    </div>
+  </body>
+  <script src="http://lib.upon.one"></script>
 
   <script>
-    const codebox = document.querySelector("textarea");
-    codebox.focus();
-    document.querySelector("textarea").addEventListener("keydown", (e) => {
+    let codebox = document.querySelector("textarea");
+    function rewireTab(e) {
       let { keyCode } = e;
-
       let { value, selectionStart, selectionEnd } = codebox;
+      console.log(selectionStart, selectionEnd);
 
-      console.log(e);
-      if (keyCode === 9) {
-        // TAB = 9
-        e.preventDefault();
-        codebox.value =
-          value.slice(0, selectionStart) + "\t" + value.slice(selectionEnd);
-        codebox.setSelectionRange(selectionStart + 1, selectionStart + 1);
+      function resetTheCursor(increment = 0) {
+        codebox.setSelectionRange(
+          selectionStart + increment,
+          selectionStart + increment
+        );
       }
-    });
 
-    document.querySelector("textarea").addEventListener("keyup", (e) => {
-      localStorage.setItem("data", e.target.value);
-    });
+      function sliceAndPut(toPut, start = selectionStart, end = selectionEnd) {
+        codebox.value = value.slice(0, start) + toPut + value.slice(end);
+      }
+
+      function addTab() {
+        e.preventDefault();
+        sliceAndPut("\t");
+        resetTheCursor(1);
+      }
+
+      function parseBulletPoint() {
+        if (value[selectionStart - 1] == "*") {
+          // e.preventDefault();
+          sliceAndPut("•", selectionStart - 1, selectionStart);
+          resetTheCursor(0);
+        }
+      }
+      switch (keyCode) {
+        case 9:
+          addTab();
+          break;
+        case 32:
+          parseBulletPoint();
+          break;
+      }
+    }
+    document.querySelector("textarea").addEventListener("keydown", rewireTab);
 
     window.addEventListener("load", () => {
+      document.querySelector("textarea").addEventListener("keyup", (e) => {
+        localStorage.setItem("data", e.target.value);
+      });
       let data = localStorage.getItem("data");
       codebox.value = data;
     });

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/ledger_1f4d2.png"
+    />
+    <meta
+      name="description"
+      content="No Login | No Bullshit | Take notes offline"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Note</title>
+    <style>
+      .editor {
+        height: 100%;
+        overflow: hidden;
+        padding: 20px;
+        font-size: 22px;
+        box-sizing: border-box;
+        background: inherit;
+        color: #fff;
+        outline: none;
+        width: 100vw;
+        flex-grow: 1;
+        overflow-y: scroll;
+        border: none;
+        resize: none;
+        font-family: inherit;
+        color: inherit;
+        display: flex;
+      }
+
+      .footer {
+        height: 10px;
+        font-weight: 100;
+        color: #999;
+        font-size: 10px;
+        padding: 5px;
+        display: flex;
+        background: inherit;
+        z-index: 55;
+        padding: 10px;
+        justify-content: space-between;
+        color: #999;
+      }
+
+      div,
+      h1,
+      h2,
+      h3 {
+        outline: none;
+        position: relative;
+      }
+
+      .holder:before {
+        content: "Type Here";
+        color: lightgray;
+        display: block;
+        position: absolute;
+        opacity: 0.5;
+        font-family: "Campton", sans-serif;
+      }
+
+      .block {
+        cursor: text;
+      }
+
+      body {
+        background: #333;
+        color: #fff;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        width: 100vw;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+          "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+          "Helvetica Neue", sans-serif;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      /* width */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      /* Track */
+      ::-webkit-scrollbar-track {
+        border-radius: 7px;
+        cursor: pointer;
+      }
+
+      /* Handle */
+      ::-webkit-scrollbar-thumb {
+        background: #111;
+        cursor: pointer;
+        border-radius: 7px;
+      }
+
+      /* Handle on hover */
+      ::-webkit-scrollbar-thumb:hover {
+        background: #111;
+      }
+
+      .editor {
+        display: flex;
+        flex-direction: column;
+      }
+
+      @media (min-width: 800px) {
+        .footer {
+          height: 20px;
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="editor">
+      <div class="block" contenteditable="true"></div>
+    </div>
+    <div class="footer">
+      <span> No signup | No bullshit | Take notes offline </span>
+
+      <div class="links">
+        <a target="_blank" href="https://github.com/itsarnavsingh/note"
+          >Fork on Github</a
+        >
+      </div>
+    </div>
+  </body>
+
+  <script>
+    let editor = document.querySelector(".editor");
+
+    function setCaretPosition(element, offset) {
+      let selection = window.getSelection();
+      var range = document.createRange();
+      range.setStart(element, offset);
+      range.collapse(true);
+      selection.addRange(range);
+      element.focus();
+    }
+
+    function manageKey(e) {
+      let selection = window.getSelection();
+      let { anchorNode, anchorOffset, focusOffset } = selection;
+
+      var special = e.ctrlKey;
+      var key = e.charCode || e.keyCode;
+
+      let rangeStart = anchorOffset < focusOffset ? anchorOffset : focusOffset;
+      let rangeEnd = anchorOffset > focusOffset ? anchorOffset : focusOffset;
+
+      if (e.key === "Enter") {
+        range = selection.getRangeAt(0);
+        let block = document.createElement("div");
+        block.setAttribute("class", "block");
+        block.setAttribute("contenteditable", true);
+        block.addEventListener("keydown", manageKey);
+        insertAfter(block, e.target);
+        setCaretPosition(block, 0);
+
+        e.preventDefault();
+      } else if (e.keyCode === 32) {
+        let textData = anchorNode.innerText || anchorNode.wholeText;
+        if (textData[rangeStart - 1] == "#") {
+          let type = "h1";
+
+          if (textData[rangeStart - 2]) {
+            if (textData[rangeStart - 2] == "#") {
+              type = "h2";
+              if (textData[rangeStart - 3]) {
+                if (textData[rangeStart - 3] == "#") {
+                  type = "h3";
+                  if (textData[rangeStart - 4]) {
+                    if (textData[rangeStart - 4] == "#") {
+                      type = "div";
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          console.log(type);
+          let h1 = document.createElement(type);
+          h1.setAttribute("class", "block");
+          h1.setAttribute("contenteditable", true);
+          h1.addEventListener("keydown", manageKey);
+          h1.innerText = e.target.innerText.replace(/\#/gi, "");
+
+          console.log(h1.innerText);
+          insertAfter(h1, e.target);
+          e.target.parentNode.insertBefore(h1, e.target);
+          e.target.parentNode.removeChild(e.target);
+
+          setCaretPosition(h1, 0);
+        } else if (textData[rangeStart - 1] == "*") {
+        }
+      }
+
+      function removeSomePart(text, start, end) {
+        let output = text.substr(0, start) + text.substr(end, text.length);
+        if (end == text.length) output += "&nbsp;";
+        return output;
+      }
+      console.log(e);
+    }
+
+    function insertAfter(newNode, referenceNode) {
+      referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+    }
+
+    function showPlaceholder(element) {
+      if (element.innerText.length > 0) {
+        element.classList.remove("holder");
+      } else if (element.tagName !== "DIV") {
+        element.classList.add("holder");
+      }
+    }
+
+    window.addEventListener("load", () => {
+      let data = localStorage.getItem("data");
+      if (data) {
+        editor.innerHTML = data;
+      }
+
+      editor.addEventListener("keyup", (e) => {
+        localStorage.setItem("data", editor.innerHTML);
+      });
+
+      let blocks = document.querySelectorAll(".block");
+
+      blocks.forEach((block) => {
+        block.addEventListener("keyup", (e) => {
+          showPlaceholder(e.target);
+        });
+        block.addEventListener("keydown", manageKey);
+      });
+    });
+  </script>
+</html>
